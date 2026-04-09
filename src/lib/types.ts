@@ -18,6 +18,7 @@ declare global {
   interface Window {
     ytrUserInteracted: boolean;
     ytrAutoLikeEnabled: typeof initial.isAutoLike;
+    ytrAutoLikeShorts: typeof initial.isAutoLikeShorts;
     ytrAutoLikeThreshold: typeof initial.autoLikeThreshold;
     ytrAutoLikeSubscribedChannels: typeof initial.isAutoLikeSubscribedChannels;
     ytrLastButtonTriggers: typeof initial.buttonTriggers;

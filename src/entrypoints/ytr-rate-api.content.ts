@@ -70,7 +70,7 @@ function init() {
 }
 
 export default defineContentScript({
-  matches: ["https://www.youtube.com/watch*"],
+  matches: ["https://www.youtube.com/watch*", "https://www.youtube.com/shorts/*"],
   world: "MAIN",
   main: () => init()
 });

@@ -6,14 +6,24 @@
 
   interface Props {
     isAutoLike: boolean;
+    isAutoLikeShorts: boolean;
     autoLikeThreshold: number;
     isAutoLikeSubscribedChannels: boolean;
   }
 
-  let { isAutoLike = $bindable(), autoLikeThreshold = $bindable(), isAutoLikeSubscribedChannels = $bindable() }: Props = $props();
+  let {
+    isAutoLike = $bindable(),
+    isAutoLikeShorts = $bindable(),
+    autoLikeThreshold = $bindable(),
+    isAutoLikeSubscribedChannels = $bindable()
+  }: Props = $props();
 
   $effect(() => {
     storage.setItem("sync:isAutoLike", isAutoLike);
+  });
+
+  $effect(() => {
+    storage.setItem("sync:isAutoLikeShorts", isAutoLikeShorts);
   });
 
   $effect(() => {
@@ -31,7 +41,9 @@
     <div class="auto-like-container">
       <ToggleSwitch disabled={keys.isRecording} bind:checked={isAutoLike}>After watched</ToggleSwitch>
       <Textbox {isAutoLike} disabled={keys.isRecording} bind:value={autoLikeThreshold} />
-    </div>
+
+    <ToggleSwitch disabled={keys.isRecording} bind:checked={isAutoLikeShorts}>Auto-like shorts</ToggleSwitch>
+
     <ToggleSwitch disabled={keys.isRecording} bind:checked={isAutoLikeSubscribedChannels}>Auto-like in subscribed channels</ToggleSwitch>
   </div>
 </section>
@@ -53,5 +65,11 @@
     display: flex;
     align-items: center;
     gap: 8px;
+  }
+
+  .auto-like-shorts {
+    display: flex;
+    align-items: center;
+    gap: 15px;
   }
 </style>

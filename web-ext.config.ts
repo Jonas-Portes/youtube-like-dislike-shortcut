@@ -8,13 +8,15 @@ const osPlatform = process.platform;
 const home = homedir();
 
 const edgeByPlatform: Partial<Record<NodeJS.Platform, string>> = {
-  win32: join(process.env.ProgramFiles!, "Microsoft/Edge/Application/msedge.exe"),
+  // Adicionado ?? "" para evitar o erro no Linux/Nobara
+  win32: join(process.env.ProgramFiles ?? "", "Microsoft/Edge/Application/msedge.exe"),
   darwin: "/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge",
   linux: "/usr/bin/microsoft-edge-stable"
 };
 
 const operaByPlatform: Partial<Record<NodeJS.Platform, string>> = {
-  win32: join(process.env.LOCALAPPDATA!, "Programs/Opera/opera.exe"),
+  // Adicionado ?? "" aqui também
+  win32: join(process.env.LOCALAPPDATA ?? "", "Programs/Opera/opera.exe"),
   darwin: "/Applications/Opera.app/Contents/MacOS/Opera",
   linux: "/usr/bin/opera"
 };
@@ -22,8 +24,8 @@ const operaByPlatform: Partial<Record<NodeJS.Platform, string>> = {
 function findDefaultFirefoxProfile() {
   const profilesDir = (() => {
     if (osPlatform === "win32") {
-      return join(process.env.APPDATA!, "Mozilla/Firefox/Profiles");
-    }
+      return join(process.env.APPDATA ?? "", "Mozilla/Firefox/Profiles");
+      }
     if (osPlatform === "darwin") {
       return join(home, "Library/Application Support/Firefox/Profiles");
     }
@@ -43,7 +45,7 @@ const LOCK_FILES = new Set(["lockfile", "SingletonLock", "SingletonCookie", "Sin
 
 function setupChromeProfile() {
   const chromeSrcByPlatform: Partial<Record<NodeJS.Platform, string>> = {
-    win32: join(process.env.LOCALAPPDATA!, "Google", "Chrome", "User Data"),
+    win32: join(process.env.LOCALAPPDATA ?? "", "Google", "Chrome", "User Data"),
     darwin: join(home, "Library", "Application Support", "Google", "Chrome"),
     linux: join(home, ".config", "google-chrome")
   };

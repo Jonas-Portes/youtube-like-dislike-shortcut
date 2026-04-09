@@ -62,6 +62,7 @@ const buttonTriggers: ButtonTriggers = {
 export const initial = {
   buttonTriggers,
   isAutoLike: false,
+  isAutoLikeShorts: false,
   isAutoLikeSubscribedChannels: false,
   autoLikeThreshold: 70
 };

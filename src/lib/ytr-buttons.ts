@@ -22,6 +22,14 @@ function getIsShorts() {
   return location.pathname.startsWith("/shorts/");
 }
 
+function getIsRegularWatchPage() {
+  return location.pathname.startsWith("/watch");
+}
+
+function getIsAllowedRoute() {
+  return getIsRegularWatchPage() || getIsShorts();
+}
+
 
 function showIndicator(isRated: boolean) {
   if (getIsShorts()) {
@@ -86,6 +94,12 @@ async function rateVideoViaApi(isLike: boolean | null) {
  * (channel trailers, embedded videos)
  */
 export async function rateVideo(isLike: boolean | null) {
+  // YouTube keeps content scripts alive across SPA route changes.
+  // Allow manual ratings only on regular videos or Shorts.
+  if (!getIsAllowedRoute()) {
+    return;
+  }
+
   const [elLike, elDislike] = getRateButtons();
 
   if (!elLike) {

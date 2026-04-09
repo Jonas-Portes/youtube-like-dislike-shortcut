@@ -12,7 +12,24 @@ let OBSERVER_SUBSCRIPTION: MutationObserver;
 let lastUrl: string | undefined;
 let lastTitle: string | undefined;
 
+function isRegularWatchPage() {
+  return location.pathname.startsWith("/watch");
+}
+
+function isShortsPage() {
+  return location.pathname.startsWith("/shorts");
+}
+
+function isAutoLikeSupportedPage() {
+  return isRegularWatchPage() || (isShortsPage() && window.ytrAutoLikeShorts);
+}
+
 async function autoLikeIfSubscribed(_?: MutationRecord[], observer?: MutationObserver) {
+  if (!isAutoLikeSupportedPage()) {
+    observer?.disconnect();
+    return false;
+  }
+
   const [elLike] = getRateButtons();
   const isSubscribed = getIsSubscribed();
   if (isSubscribed && elLike && !getRatedButton()) {
@@ -34,6 +51,10 @@ async function addTemporaryBodyListener() {
   lastTitle = document.title;
 
   if (!window.ytrAutoLikeSubscribedChannels) {
+    return;
+  }
+
+  if (!isAutoLikeSupportedPage()) {
     return;
   }
 
@@ -62,6 +83,10 @@ function addStorageListener() {
       await autoLikeIfSubscribed();
     }
   });
+
+  storage.watch<boolean>("sync:isAutoLikeShorts", isAutoLikeShorts => {
+    window.ytrAutoLikeShorts = isAutoLikeShorts !== null ? isAutoLikeShorts : initial.isAutoLikeShorts;
+  });
 }
 
 async function addSubscribedEventListener() {
@@ -70,7 +95,7 @@ async function addSubscribedEventListener() {
 }
 
 export default defineContentScript({
-  matches: ["https://www.youtube.com/watch*"],
+  matches: ["https://www.youtube.com/watch*", "https://www.youtube.com/shorts/*"],
   async main () {
     lastUrl = location.href;
     lastTitle = document.title;
@@ -87,6 +112,12 @@ export default defineContentScript({
       key: "isAutoLikeSubscribedChannels",
       fallback: initial.isAutoLikeSubscribedChannels,
       updateWindowKey: "ytrAutoLikeSubscribedChannels"
+    });
+    window.ytrAutoLikeShorts = await getStorage({
+      area: "sync",
+      key: "isAutoLikeShorts",
+      fallback: initial.isAutoLikeShorts,
+      updateWindowKey: "ytrAutoLikeShorts"
     });
 
     addStorageListener();

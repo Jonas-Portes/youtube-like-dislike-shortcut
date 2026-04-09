@@ -12,6 +12,18 @@ function getIsLiveOrPremiere() {
   return Boolean(getVisibleElement(SELECTORS.liveBadge));
 }
 
+function isRegularWatchPage() {
+  return location.pathname.startsWith("/watch");
+}
+
+function isShortsPage() {
+  return location.pathname.startsWith("/shorts");
+}
+
+function isAutoLikeSupportedPage() {
+  return isRegularWatchPage() || (isShortsPage() && window.ytrAutoLikeShorts);
+}
+
 let ratingWatchObserver: MutationObserver | null = null;
 let ratingSettleTimeout: ReturnType<typeof setTimeout> | null = null;
 
@@ -98,7 +110,7 @@ function watchForInitialRating() {
 }
 
 export default defineContentScript({
-  matches: ["https://www.youtube.com/watch*"],
+  matches: ["https://www.youtube.com/watch*", "https://www.youtube.com/shorts/*"],
   cssInjectionMode: "ui",
   async main(ctx) {
     let isMounting = false;
@@ -110,12 +122,18 @@ export default defineContentScript({
     sharedState.isAdPlaying = getIsAdPlaying();
     sharedState.isAdInitiallyPlaying = sharedState.isAdPlaying;
 
-    const [isAutoLike, autoLikeThreshold] = await Promise.all([
+    const [isAutoLike, isAutoLikeShorts, autoLikeThreshold] = await Promise.all([
       getStorage({
         area: "sync",
         key: "isAutoLike",
         fallback: false,
         updateWindowKey: "ytrAutoLikeEnabled"
+      }),
+      getStorage({
+        area: "sync",
+        key: "isAutoLikeShorts",
+        fallback: false,
+        updateWindowKey: "ytrAutoLikeShorts"
       }),
       getStorage({
         area: "sync",
@@ -126,6 +144,10 @@ export default defineContentScript({
     ]);
 
     async function mountUiIfNeeded() {
+      if (!isAutoLikeSupportedPage()) {
+        return;
+      }
+
       if (isMounting || document.querySelector(elementNameToInject)) {
         return;
       }
@@ -176,6 +198,10 @@ export default defineContentScript({
         watchForInitialRating();
       }
 
+      if (!isAutoLikeSupportedPage()) {
+        return;
+      }
+
       if (window.ytrUserInteracted) {
         sharedState.isUserInteracted = true;
         return;
@@ -223,6 +249,7 @@ export default defineContentScript({
         sharedState.percentageWatched += (delta / duration) * 100;
         const shouldAutoLike =
           (window.ytrAutoLikeEnabled ?? isAutoLike) &&
+          (isRegularWatchPage() || (isShortsPage() && (window.ytrAutoLikeShorts ?? isAutoLikeShorts))) &&
           sharedState.percentageWatched >= (window.ytrAutoLikeThreshold ?? autoLikeThreshold) &&
           !sharedState.isLiveOrPremiere &&
           !sharedState.isUserInteracted &&

@@ -13,6 +13,7 @@
 
   const autoLikePromise = Promise.all([
     storage.getItem<typeof initial.isAutoLike>("sync:isAutoLike", { fallback: initial.isAutoLike }),
+    storage.getItem<typeof initial.isAutoLikeShorts>("sync:isAutoLikeShorts", { fallback: initial.isAutoLikeShorts }),
     storage.getItem<typeof initial.autoLikeThreshold>("sync:autoLikeThreshold", { fallback: initial.autoLikeThreshold }),
     storage.getItem<typeof initial.isAutoLikeSubscribedChannels>("sync:isAutoLikeSubscribedChannels", { fallback: initial.isAutoLikeSubscribedChannels })
   ]);
@@ -64,8 +65,8 @@
     <KeyboardShortcut type={ShortcutType.dislike}>Dislike</KeyboardShortcut>
     <KeyboardShortcut type={ShortcutType.unrate}>Un-rate</KeyboardShortcut>
   {/if}
-  {#await autoLikePromise then [isAutoLike, autoLikeThreshold, isAutoLikeSubscribedChannels]}
-    <AutoLike {isAutoLike} {autoLikeThreshold} {isAutoLikeSubscribedChannels} />
+  {#await autoLikePromise then [isAutoLike, isAutoLikeShorts, autoLikeThreshold, isAutoLikeSubscribedChannels]}
+    <AutoLike {isAutoLike} {isAutoLikeShorts} {autoLikeThreshold} {isAutoLikeSubscribedChannels} />
   {/await}
 </main>
 
