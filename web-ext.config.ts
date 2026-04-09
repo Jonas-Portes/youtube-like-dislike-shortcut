@@ -71,7 +71,7 @@ export default defineWebExtConfig({
     edge: edgeByPlatform[osPlatform] ?? "",
     opera: operaByPlatform[osPlatform] ?? ""
   },
-  startUrls: ["https://www.youtube.com/watch?v=aiSla-5xq3w"],
+  startUrls: ["https://youtu.be/YPN0qhSyWy8"],
   ...process.env.CHROME_WITH_PROFILE === "1" && {
     keepProfileChanges: true,
     chromiumProfile: resolve(import.meta.dirname, "../User Data")

@@ -70,7 +70,7 @@ async function addSubscribedEventListener() {
 }
 
 export default defineContentScript({
-  matches: ["https://www.youtube.com/*"],
+  matches: ["https://www.youtube.com/watch*"],
   async main () {
     lastUrl = location.href;
     lastTitle = document.title;

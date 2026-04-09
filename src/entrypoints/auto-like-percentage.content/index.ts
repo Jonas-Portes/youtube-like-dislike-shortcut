@@ -98,7 +98,7 @@ function watchForInitialRating() {
 }
 
 export default defineContentScript({
-  matches: ["https://www.youtube.com/*"],
+  matches: ["https://www.youtube.com/watch*"],
   cssInjectionMode: "ui",
   async main(ctx) {
     let isMounting = false;
